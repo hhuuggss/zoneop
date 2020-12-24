@@ -1,5 +1,6 @@
-This is a basic plugin template for use with CommonLibSSE
+# Script extender plugin for [zone magic](https://www.nexusmods.com/skyrimspecialedition/mods/22318), a mod for a game about dragons.
 
+Included here are the build instructions supplied with [ExamplePlugin-CommonLibSSE](https://github.com/Ryan-rsm-McKenzie/ExamplePlugin-CommonLibSSE):
 ## Requirements
 * [CMake](https://cmake.org/)
 	* Add this to your `PATH`
@@ -17,8 +18,8 @@ This is a basic plugin template for use with CommonLibSSE
 
 ## Building
 ```
-git clone https://github.com/Ryan-rsm-McKenzie/ExamplePlugin-CommonLibSSE
-cd ExamplePlugin-CommonLibSSE
+git clone https://github.com/hhuuggss/zoneop
+cd zoneop
 git submodule update --init --recursive
 git submodule update --recursive --remote
 cmake -B build -S .
