@@ -7,8 +7,9 @@ set(VCPKG_TARGET_TRIPLET "x64-windows-static" CACHE STRING "")
 # ---- Project ----
 
 project(
-	ExampleProject
-	VERSION 1.0.0
+	zoneop
+	VERSION 2.0.0
+	DESCRIPTION "zone operations for zone magic"
 	LANGUAGES CXX
 )
 
@@ -120,11 +121,15 @@ find_package(spdlog REQUIRED)
 
 set(headers
 	src/PCH.h
+	src/Papyrus.h
+	src/ZoneDataHandler.h
 )
 
 set(sources
 	src/main.cpp
 	src/PCH.cpp
+	src/Papyrus.cpp
+	src/ZoneDataHandler.cpp
 )
 
 source_group(
