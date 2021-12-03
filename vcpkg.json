@@ -1,12 +1,12 @@
 {
   "name": "zoneop",
-  "version-string": "2.0.0",
+  "version-string": "2.1.0",
   "description": "zone operations for zone magic",
-  "homepage": "https://www.nexusmods.com/skyrimspecialedition/mods/22318",
+  "homepage": "https://github.com/hhuuggss/zoneop",
   "license": "MIT",
   "dependencies": [
-    "boost-atomic",
-    "span-lite",
+    "boost-stl-interfaces",
+    "rsm-binary-io",
     "spdlog"
   ]
 }

@@ -9,6 +9,7 @@ namespace ZoneDataHandler {
 				RevertZone(zone);
 			}
 		}
+		changes.clear();
 	}
 	void InitZones() {
 		logger::info("get zone min/max defaults from game data");
