@@ -1,12 +1,10 @@
 {
   "name": "zoneop",
-  "version-string": "2.1.0",
+  "version-string": "2.2.0",
   "description": "zone operations for zone magic",
   "homepage": "https://github.com/hhuuggss/zoneop",
   "license": "MIT",
   "dependencies": [
-    "boost-stl-interfaces",
-    "rsm-binary-io",
-    "spdlog"
+    "commonlibsse-ng"
   ]
 }

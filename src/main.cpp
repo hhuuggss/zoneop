@@ -1,6 +1,9 @@
 ﻿#include "ZoneDataHandler.h"
 #include "Papyrus.h"
 
+using namespace SKSE;
+using namespace SKSE::log;
+
 enum : std::uint32_t
 {
 	PluginID = 'ZNOP',
@@ -8,7 +11,7 @@ enum : std::uint32_t
 	DataVersion = 1
 };
 
-void SaveCallback(SKSE::SerializationInterface* intfc) {
+void SaveCallback(SerializationInterface* intfc) {
 	if (!intfc->OpenRecord(ZoneDataID, DataVersion)) {
 		logger::warn("couldn't open zonedata record to save to");
 		return;
@@ -16,7 +19,7 @@ void SaveCallback(SKSE::SerializationInterface* intfc) {
 	ZoneDataHandler::Save(intfc);
 }
 
-void LoadCallback(SKSE::SerializationInterface* intfc) {
+void LoadCallback(SerializationInterface* intfc) {
 	std::uint32_t type, ver, length;
 	while (intfc->GetNextRecordInfo(type, ver, length)) {
 		if (ver > DataVersion) {
@@ -33,29 +36,17 @@ void LoadCallback(SKSE::SerializationInterface* intfc) {
 	}
 }
 
-void MessageCallback(SKSE::MessagingInterface::Message* msg) {
-	switch (msg->type) {
-	case SKSE::MessagingInterface::kDataLoaded:
+void RevertCallback(SerializationInterface* intfc) {
+	ZoneDataHandler::Reset();
+}
+
+void MessageCallback(MessagingInterface::Message* msg) {
+	if (msg->type == MessagingInterface::kDataLoaded) {
 		ZoneDataHandler::InitZones();
-		break;
-	case SKSE::MessagingInterface::kPreLoadGame:
-	case SKSE::MessagingInterface::kNewGame:
-		ZoneDataHandler::Reset();	
 	}
 }
 
-extern "C" __declspec(dllexport) constinit auto SKSEPlugin_Version = []() 
-{
-	SKSE::PluginVersionData v{};
-	v.PluginVersion(Version::MAJOR);
-	v.PluginName(Version::PROJECT);
-	v.AuthorName("hhuuggss"sv);
-	v.UsesAddressLibrary(true);
-	v.CompatibleVersions({ SKSE::RUNTIME_LATEST });
-	return v;
-}();
-
-extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
+SKSEPluginLoad(LoadInterface* skse)
 {
 
 	auto path = logger::log_directory();
@@ -63,34 +54,36 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 		return false;
 	}
 
-	*path /= Version::PROJECT;
+	*path /= PluginDeclaration::GetSingleton()->GetName();
 	*path += ".log"sv;
-	auto sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(path->string(), true);
-
-	auto log = std::make_shared<spdlog::logger>("global log"s, std::move(sink));
-
+	std::shared_ptr<spdlog::logger> log;
+	log = std::make_shared<spdlog::logger>("Global", std::make_shared<spdlog::sinks::basic_file_sink_mt>(path->string(), true));
+	
 	log->set_level(spdlog::level::info);
 	log->flush_on(spdlog::level::info);
 
 	spdlog::set_default_logger(std::move(log));
 	spdlog::set_pattern("[%l] %v"s);
 
-	logger::info(FMT_STRING("{} v{} loaded"), Version::PROJECT, Version::NAME);
+	logger::info(FMT_STRING("{} v{} loaded"), PluginDeclaration::GetSingleton()->GetName(), PluginDeclaration::GetSingleton()->GetVersion());
 
-	SKSE::Init(a_skse);
+	Init(skse);
 
-	auto MessagingInterface = SKSE::GetMessagingInterface();
-	if (!MessagingInterface->RegisterListener(MessageCallback)) return false;
+	auto MessagingInterface = GetMessagingInterface();
+	if (!MessagingInterface->RegisterListener(MessageCallback))
+		return false;
 
-	auto PapyrusInterface = SKSE::GetPapyrusInterface();
-	if (!PapyrusInterface->Register(Papyrus::Register)) return false;
+	auto PapyrusInterface = GetPapyrusInterface();
+	if (!PapyrusInterface->Register(Papyrus::Register))
+		return false;
 
-	auto SerializationInterface = SKSE::GetSerializationInterface();
+	auto SerializationInterface = GetSerializationInterface();
 	SerializationInterface->SetUniqueID(PluginID);
 	SerializationInterface->SetLoadCallback(LoadCallback);
+	SerializationInterface->SetRevertCallback(RevertCallback);
 	SerializationInterface->SetSaveCallback(SaveCallback);
 
-	logger::info(FMT_STRING("{} ready"), Version::PROJECT);
+	logger::info(FMT_STRING("{} ready"), PluginDeclaration::GetSingleton()->GetName());
 
 	return true;
 }
